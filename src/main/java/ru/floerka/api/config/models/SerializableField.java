@@ -30,6 +30,10 @@ public class SerializableField<T> {
         return cachedSerializedObject;
     }
 
+    public String getAsString() {
+        return serialize(cachedSerializedObject);
+    }
+
     private String serialize(T from) {
         return serializer.serialize(from);
     }

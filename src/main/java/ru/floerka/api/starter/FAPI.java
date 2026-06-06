@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 import ru.floerka.api.inventory.listeners.FClickListener;
+import ru.floerka.api.managers.EquipmentManager;
 import ru.floerka.api.managers.ParticleManager;
 import ru.floerka.api.managers.SoundManager;
 import ru.floerka.api.starter.models.Manager;
@@ -22,6 +23,7 @@ public class FAPI {
         managerMap = new HashMap<>();
         managerMap.put(ParticleManager.class, new ParticleManager());
         managerMap.put(SoundManager.class, new SoundManager());
+        managerMap.put(EquipmentManager.class, new EquipmentManager());
     }
 
     public static void init(JavaPlugin plugin) {
