@@ -17,7 +17,7 @@ public class FClickListener implements Listener {
         Inventory inventory = e.getClickedInventory();
         if(inventory != null && inventory.getHolder() != null && inventory.getHolder() instanceof FHolder holder) {
             try {
-                Method method = holder.getClass().getDeclaredMethod("onClickEvent", InventoryClickEvent.class);
+                Method method = FHolder.class.getDeclaredMethod("onClickEvent", InventoryClickEvent.class);
                 method.setAccessible(true);
                 method.invoke(holder, e);
             } catch (Exception ex) {
@@ -30,7 +30,7 @@ public class FClickListener implements Listener {
         Inventory inventory = event.getInventory();
         if(inventory.getHolder() != null && inventory.getHolder() instanceof FHolder holder) {
             try {
-                Method method = holder.getClass().getDeclaredMethod("onCloseEvent", InventoryCloseEvent.class);
+                Method method = FHolder.class.getDeclaredMethod("onCloseEvent", InventoryCloseEvent.class);
                 method.setAccessible(true);
                 method.invoke(holder, event);
             } catch (Exception ex) {

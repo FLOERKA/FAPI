@@ -39,4 +39,5 @@ public abstract class AbstractCooldowns<T> {
     public boolean isExpired(T name) {
         return getCooldownAsMillis(name) <= 0;
     }
+
 }
