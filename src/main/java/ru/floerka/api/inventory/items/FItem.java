@@ -14,14 +14,17 @@ import com.mojang.authlib.properties.Property;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.AllArgsConstructor;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
+import ru.floerka.api.inventory.items.interfaces.STSInterface;
 import ru.floerka.api.utils.ColorUtils;
 import ru.floerka.api.utils.IntUtils;
 
@@ -114,6 +117,19 @@ public class FItem {
         returnMeta(meta);
     }
 
+    public void updateDisplay(STSInterface sts) {
+        String display = getDefaultMeta().getDisplayName();
+        setDisplay(sts.accept(display));
+    }
+    public void updateLore(STSInterface sts) {
+        List<String> lore = getDefaultMeta().getLore();
+        if(lore == null) {
+            throw new RuntimeException();
+        }
+        List<String> updated = lore.stream().map(sts::accept).toList();
+        setLore(updated);
+    }
+
     public ItemMeta getDefaultMeta() {
         return itemStack.getItemMeta();
     }
@@ -130,7 +146,7 @@ public class FItem {
         }).toList();
 
         ItemMeta meta = getDefaultMeta();
-        meta.setLore(lore);
+        meta.setLore(colored);
         returnMeta(meta);
     }
     public void setDisplay(String display, String... replacement) {
@@ -182,6 +198,15 @@ public class FItem {
         ItemMeta meta =getDefaultMeta();
         meta.setUnbreakable(true);
         returnMeta(meta);
+    }
+
+    public void enablePlaceholders(Player player) {
+        ItemMeta meta = getDefaultMeta();
+        if(meta.hasDisplayName())
+            setDisplay(PlaceholderAPI.setPlaceholders(player, meta.getDisplayName()));
+        if(meta.hasLore()) {
+            setLore(meta.getLore().stream().map(s -> PlaceholderAPI.setPlaceholders(player, s)).toList());
+        }
     }
 
     public CustomDataUtil getLocalDataManager() {

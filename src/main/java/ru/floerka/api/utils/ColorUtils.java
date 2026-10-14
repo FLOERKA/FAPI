@@ -1,6 +1,8 @@
 package ru.floerka.api.utils;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -25,6 +27,13 @@ public class ColorUtils {
         matcher.appendTail(builder);
 
         return ChatColor.translateAlternateColorCodes('&', builder.toString());
+    }
+    public static String compilation(Player player, String message) {
+        String colored = color(message);
+        if(PaPiUtil.isEnabled()) {
+            colored = PlaceholderAPI.setPlaceholders(player, colored);
+        }
+        return colored;
     }
 
     public static List<String> color(List<String> reference) {
