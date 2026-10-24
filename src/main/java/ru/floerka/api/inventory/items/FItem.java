@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.floerka.api.inventory.items.interfaces.STSInterface;
 import ru.floerka.api.utils.ColorUtils;
 import ru.floerka.api.utils.IntUtils;
+import ru.floerka.api.utils.skull.SkullUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -178,19 +179,7 @@ public class FItem {
         if (base64 == null || base64.isEmpty()) return;
         if(!isCustomMeta(SkullMeta.class)) return;
         SkullMeta skull = getCustomMeta(SkullMeta.class);
-
-        GameProfile profile = new GameProfile(UUID.randomUUID(), profileName);
-
-        profile.getProperties().put("textures", new Property("textures", base64));
-
-        try {
-            Field profileField = skull.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(skull, profile);
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        SkullUtils.applySkin(skull, base64,profileName);
         returnMeta(skull);
     }
 

@@ -2,6 +2,7 @@ package ru.floerka.api.database.impl;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.SneakyThrows;
 import ru.floerka.api.config.models.SerializableField;
 
 import java.sql.Connection;
@@ -18,21 +19,37 @@ public abstract class HikariDatabase extends AbstractDatabase {
     }
 
     public void execute(String command, Object... args) {
-        command = prepareCommand(command, args);
-        try(Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(command)) {
+        try(Connection connection = dataSource.getConnection(); PreparedStatement statement = prepareCommand(connection.prepareStatement(command), args)) {
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
     public void executeQuery(String command, ResultMapper mapper, Object... args) {
-        command = prepareCommand(command, args);
-        try(Connection connection = dataSource.getConnection(); PreparedStatement statement = connection.prepareStatement(command)) {
+        try(Connection connection = dataSource.getConnection(); PreparedStatement statement = prepareCommand(connection.prepareStatement(command), args)) {
             ResultSet resultSet = statement.executeQuery();
             mapper.map(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @SneakyThrows
+    public PreparedStatement prepareCommand(PreparedStatement statement, Object... args) {
+        for(int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+
+            Object returned;
+
+            if(arg instanceof SerializableField<?> serializableField) {
+                returned = serializableField.getAsString();
+            } else {
+                returned = arg;
+            }
+
+            statement.setObject(i+1, returned);
+        }
+        return statement;
     }
 
 
