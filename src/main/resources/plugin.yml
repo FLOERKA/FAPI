@@ -1,0 +1,4 @@
+name: FAPI
+main: ru.floerka.api.bukkit.BukkitPlugin
+api-version: 1.21
+version: 1.0.0
