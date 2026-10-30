@@ -49,7 +49,7 @@ public class FItem {
         return new FItem(itemStack);
     }
     public static FItem empty() {
-        return new FItem(new ItemStack(Material.AIR));
+        return new FItem(new ItemStack(Material.PAPER));
     }
     public static FItem fromMaterial(Material material) {
         return new FItem(material);

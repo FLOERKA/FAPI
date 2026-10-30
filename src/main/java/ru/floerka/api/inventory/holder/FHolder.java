@@ -144,7 +144,7 @@ public class FHolder implements InventoryHolder {
         if(event.getPlayer() instanceof Player player) {
             Inventory inv = event.getInventory();
             if(this instanceof FPagedHolder page) {
-                page.clearPlayerPage(player.getUniqueId());
+                page.clearPlayerPage();
             }
             this.onClose.onClose(new CloseEvent(player, inv, event));
         }
