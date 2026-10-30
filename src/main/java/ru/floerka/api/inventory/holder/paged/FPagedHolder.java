@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 public class FPagedHolder extends FHolder {
 
     private final List<Integer> itemsSlots = new ArrayList<>();
 
-    private final Cache<UUID, Integer> pages = CacheBuilder.newBuilder()
-            .expireAfterAccess(1, TimeUnit.MINUTES)
-            .build();
+    private final List<ItemStack> filledItems = new ArrayList<>();
+    private final AtomicInteger currentPlayerPage = new AtomicInteger(0);
 
     public FPagedHolder(int size, String title) {
         super(size, title);
@@ -59,33 +59,60 @@ public class FPagedHolder extends FHolder {
                 }
             }
         }
+        System.out.println(itemsSlots);
     }
 
-    public <T> void paintItems(List<T> allItems, UUID player, ItemConsumer<T> consumer) {
-        int playerPage = getPlayerPage(player);
+    public <T> void paintItems(List<T> allItems, ItemConsumer<T> consumer) {
+        this.filledItems.clear();
+
+        int playerPage = getCurrentPage();
         int pagesAmount = allItems.size() / itemsSlots.size();
         if(playerPage > pagesAmount) return;
-        int itemsPerPage = allItems.size() / pagesAmount;
+        int itemsPerPage = allItems.size() / (pagesAmount > 0 ? pagesAmount : 1);
         int startSlot = playerPage * itemsPerPage;
         int endSlot = startSlot + itemsPerPage;
 
+        int inventorySlot = 0;
         for(int i = startSlot; i < endSlot; i++) {
             if(allItems.size() > i) {
                 T item = allItems.get(i);
                 ItemStack stack = consumer.createItem(item);
-                getInventory().setItem(i, stack);
+                getInventory().setItem(itemsSlots.get(inventorySlot), stack);
+                this.filledItems.add(stack);
+                inventorySlot++;
             }
         }
     }
 
-    public int getPlayerPage(UUID player) {
-        if(pages.asMap().containsKey(player)) {
-            return pages.getIfPresent(player);
-        } else return 1;
+    public int getCurrentPage() {
+        return currentPlayerPage.get();
+    }
+    public void updatePage(int newPage) {
+        currentPlayerPage.set(newPage);
+    }
+    public boolean nextPage() {
+        int currentPage = getCurrentPage();
+        if(currentPage+1 > getMaxPages()) {
+            return false;
+        }
+        updatePage(currentPage+1);
+        return true;
+    }
+    public boolean prevPage() {
+        int currentPage = getCurrentPage();
+        if(currentPage <= 1) return false;
+        updatePage(currentPage-1);
+        return true;
+    }
+    public int getMaxPages() {
+        int allItems = filledItems.size();
+        int itemsPerPage = itemsSlots.size();
+
+        return allItems / itemsPerPage;
     }
 
-    public void clearPlayerPage(UUID player) {
-        pages.invalidate(player);
+    public void clearPlayerPage() {
+        currentPlayerPage.set(1);
     }
 
 
