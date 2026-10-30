@@ -26,8 +26,8 @@ public abstract class HikariDatabase extends AbstractDatabase {
         }
     }
     public void executeQuery(String command, ResultMapper mapper, Object... args) {
-        try(Connection connection = dataSource.getConnection(); PreparedStatement statement = prepareCommand(connection.prepareStatement(command), args)) {
-            ResultSet resultSet = statement.executeQuery();
+        try(Connection connection = dataSource.getConnection(); PreparedStatement statement = prepareCommand(connection.prepareStatement(command), args)
+        ; ResultSet resultSet = statement.executeQuery()) {
             mapper.map(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
